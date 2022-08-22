@@ -7,9 +7,6 @@ import 'react-native-url-polyfill/auto';
 import * as encoding from 'text-encoding';
 const base64Decode = require('fast-base64-decode')
 const { NativeModules } = require('react-native')
-import RNFetchBlob from 'react-native-fetch-blob'
-
-const Blob = RNFetchBlob.polyfill.Blob
 
 /*if (typeof global.crypto !== 'object') {
   console.log("global.crypto doesn't exist, we initialize it.");

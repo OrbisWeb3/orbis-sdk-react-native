@@ -5,10 +5,6 @@ import { blobToBase64, decodeb64, buf2hex, getAddressFromDid, sleep } from "./in
 
 /** Replaces localStorage in React Native */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ReactNativeBlobUtil from 'react-native-blob-util'
-
-const Blob = ReactNativeBlobUtil.polyfill.Blob
-
 
 /** Initialize lit */
 let lit;
@@ -134,7 +130,7 @@ export async function decryptString(encryptedContent) {
   /** Generate blob for string */
   let _blob;
   try {
-    _blob = await base64toBlob(decodedString);
+    _blob = base64toBlob(decodedString);
     console.log("Blob generated: ", _blob);
   } catch(e) {
     console.log("Error generating blob for string: ", e);
@@ -154,17 +150,10 @@ export async function decryptString(encryptedContent) {
   }
 }
 
-async function base64toBlob(b64Data) {
+function base64toBlob(b64Data) {
   console.log("base64toBlob() / b64Data:", b64Data);
-  let _blob;
-  //let _blob = new Blob([b64Data], {type: ""});
-  Blob.build(b64Data, { type: '' }).then((blob) => {
-    console.log("blob generated: ", blob);
-    _blob = blob;
-      // do something with the Blob
-  });
-  await _blob;
-  console.log("base64toBlob() / Abut to return: ", _blob);
+  let _blob = new Blob([b64Data], {type: ""});
+  console.log("base64toBlob() / _blob: ", _blob);
   return _blob
 }
 
