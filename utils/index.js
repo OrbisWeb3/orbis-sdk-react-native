@@ -1,5 +1,3 @@
-import { Buffer } from 'buffer';
-
 /** Force index a stream. This shouldn't be necessary because our indexer picks up all new streams automatically but at least we are 100% sure. */
 export async function forceIndex(stream_id) {
   const requestOptions = {
@@ -95,6 +93,7 @@ export function blobToBase64(blob) {
 
 /** Decodes a b64 string */
 export function decodeb64(b64String) {
+  console.log("SDK: Enter decodeb64()");
   return new Uint8Array(Buffer.from(b64String, "base64"));
 }
 

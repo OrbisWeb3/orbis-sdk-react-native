@@ -8,7 +8,7 @@ import { EthereumAuthProvider, SolanaAuthProvider } from '@ceramicnetwork/blockc
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /** Lit Protocol */
-import LitJsSdk from 'lit-js-sdk'
+import LitJsSdk from 'lit-js-sdk-no-wasm'
 import { connectLit, generateLitSignature, generateAccessControlConditionsForDMs, encryptDM, encryptPost, decryptString } from "./utils/lit-helpers.js";
 
 /** Internal helpers */
@@ -20,8 +20,32 @@ const MAINNET_NODE_URL = "https://node1.orbis.club/";
 const TESTNET_NODE_URL = "https://ceramic-clay.3boxlabs.com";
 
 /** Set schemas Commit IDs */
-const postSchemaCommit = "k3y52l7qbv1fryn1brl9cvef0hilj561ooi6i3ac1l21rj2npron7nf2xneuace0w";
-const channelSchema = "k3y52l7qbv1fry19cf09hgx3lvrqjvqknpzj8ens7hh3xaz0pmu7kret3y7gqs1kw";
+const postSchemaStream = "kjzl6cwe1jw145vf8e3qu3bdm9o4wbe1x9tnq197re4knsywt0e9e8a49phe75n";
+const postSchemaCommit = "k3y52l7qbv1frxlrgboamtzkwucrmtszxoluwp4xj6sgixa09aatet6vyd17oyw3k";
+
+const channelSchemaStream = "kjzl6cwe1jw1481vk3z30owkij3665fa33b54b7wjw7v4csscrvfuurpv8xaikh";
+const channelSchemaCommit = "k6zn3rc3v8qin14jvrfyxfhajtbjuqj1ae3v7cptbh4dp47lm9rrrta4bw26td7cvu2ixs5s9be21r6q0jn4i1eb7zvtz2ka3xt9059eochaq5a1ajobl16";
+
+const profileSchemaStream = "kjzl6cwe1jw147z3fd3tpwhnid3kroebsn9wimfawhcoe09thzudg43semys0dh";
+const profileSchemaCommit = "k3y52l7qbv1fry0pkd977c71j6l5fothvvpif8fgtize5flxtryvzml6y03bb6nsw";
+
+const reactionSchemaStream = "kjzl6cwe1jw14a1xm07lqfrpoi25nleamzakwbxp3qyh1ndxe6y2ha1i2stt9pk";
+const reactionSchemaCommit = "k3y52l7qbv1fryfhr0hi2k052m8fc7s5nnez8lwvminp57qb1gxe9mveojx0051q8";
+
+const followSchemaStream = "kjzl6cwe1jw146qqj9wfuzefr74q84v2mcoszkmdqgcv34r3b6z4c6o2s8mrd4m";
+const followSchemaCommit = "k3y52l7qbv1frxry4p2eosbqo1epmhukymy8e4yn5o4bh29snjllqunf7stdulcsg";
+
+const groupMemberSchemaStream = "kjzl6cwe1jw147b0vp4b9axd7eb6wntvnvbsvqkq5czlpaumirbzoxz3rmof4qc";
+const groupMemberSchemaCommit = "k3y52l7qbv1frxvye9emo25p9wlrl49gh5qrxdozdy4d6bx5s5ed9tdlmsh9nln9c";
+
+const conversationSchemaStream = "kjzl6cwe1jw149zcbbtuurfb60l26wrf49uxntln6zuagk4140dtpcevub8o4ac";
+const conversationSchemaCommit = "k3y52l7qbv1fryezbkk4ber0ves5rl4yzie3zdehwxqvedr0nwiqb889ufjxnihhc";
+
+const messageSchemaStream = "kjzl6cwe1jw147amc7t931duuxwixltfss7uft7aa4cw7ik4dquprfs2bsgkeso";
+const messageSchemaCommit = "k3y52l7qbv1frxvviuvk0llujg13amz5cconsgfnt3yzp1fz35qyf747kjudt57uo";
+
+const notificationsReadSchemaStream = "kjzl6cwe1jw147y7iul21b8xce0h2w0gz4favuj8d9ybxhlwn9lyrnc0t3dbtf4"
+const notificationsReadSchemaCommit = "k3y52l7qbv1fry0j9i1hqhbzh43ndgjncprgteh4ries4u57s5gc78lxhqvys17gg"
 
 /** Definition of the Orbis class powering the Orbis SDK */
 export class Orbis {
@@ -434,7 +458,7 @@ export class Orbis {
 		}
 
 		/** Create channel object */
-		let result = await this.createTileDocument(content, ["orbis", "channel"], channelSchema);
+		let result = await this.createTileDocument(content, ["orbis", "channel"], channelSchemaCommit);
 		return result;
 	}
 
@@ -449,7 +473,7 @@ export class Orbis {
 		}
 
 		/** Update TileDocument with new content */
-		let result = await this.updateTileDocument(channel_id, content, ["orbis", "channel"], channelSchema);
+		let result = await this.updateTileDocument(channel_id, content, ["orbis", "channel"], channelSchemaCommit);
 		return result;
 	}
 
@@ -598,7 +622,7 @@ export class Orbis {
 		}
 
 		/** Create tile for this message */
-		let result = await this.createTileDocument(_content, ["orbis", "message"], "k3y52l7qbv1fry9kw12vvvn52a0x16asq599y4vl1tt42kjd1ype4pw5fwuj3dkao");
+		let result = await this.createTileDocument(_content, ["orbis", "message"], messageSchemaCommit);
 		return result;
 	}
 
@@ -619,6 +643,7 @@ export class Orbis {
 
 	/** Decrypt a direct message using Lit Protocol */
 	async decryptMessage(content) {
+		console.log("SDK: Enter decryptMessage.")
 		let res;
 		try {
 			res = await decryptString(content.encryptedMessage);

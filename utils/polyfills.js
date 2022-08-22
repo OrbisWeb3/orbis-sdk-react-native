@@ -7,8 +7,19 @@ import 'react-native-url-polyfill/auto';
 import * as encoding from 'text-encoding';
 const base64Decode = require('fast-base64-decode')
 const { NativeModules } = require('react-native')
-import 'react-native-webcrypto'
-var sha256 = require('js-sha256');
+import RNFetchBlob from 'react-native-fetch-blob'
+
+const Blob = RNFetchBlob.polyfill.Blob
+
+/*if (typeof global.crypto !== 'object') {
+  console.log("global.crypto doesn't exist, we initialize it.");
+  global.crypto = {}
+}
+
+
+/** Assign crypto
+global.crypto = crypto;
+console.log("global.crypto: ", global.crypto);*/
 
 /** Polyfill to fix allSettled */
 Promise.allSettled = function (promises) {
@@ -69,9 +80,10 @@ function getRandomBase64 (byteLength) {
 }
 
 /**
+ * Polyfill to replace the crypto.getRandomValues function
  * @param {Int8Array|Uint8Array|Int16Array|Uint16Array|Int32Array|Uint32Array|Uint8ClampedArray} array
  */
-function getRandomValues (array) {
+function _getRandomValues (array) {
   if (!(array instanceof Int8Array || array instanceof Uint8Array || array instanceof Int16Array || array instanceof Uint16Array || array instanceof Int32Array || array instanceof Uint32Array || array instanceof Uint8ClampedArray)) {
     throw new TypeMismatchError('Expected an integer array')
   }
@@ -94,24 +106,56 @@ function getRandomValues (array) {
   return array
 }
 
-async function _digest(name, data) {
+/** Polyfill to replace the crypto.subtle.digest function */
+async function _digest(algo, data) {
+  console.log("Enter _digest with:");
+  console.log("algo:", algo);
+  console.log("data:", data);
   let hash = sha256.create().update(data).digest();
+  console.log("Returning " + hash + " from _digest.");
   return hash
 }
 
-global.crypto = crypto;
 
-if (typeof global.crypto !== 'object') {
-  console.log("global.crypto doesn't exist, we initialize it.");
-  global.crypto = {}
+
+async function digestCrypto(algo, data) {
+  console.log("Enter digestCrypto with:");
+  console.log("algo:", algo);
+  console.log("data:", data);
+  let res_hash;
+  global.crypto.subtle.digest({ name: 'SHA-256' }, data).then(hash => {
+    console.log("hash: ", hash);
+    res_hash = hash;
+    console.log("Returning " + res_hash + " from digestCrypto.");
+    return res_hash;
+  });
+
 }
 
-if (typeof global.crypto.getRandomValues !== 'function') {
-  console.log("global.crypto.getRandomValues doesn't exist, we assign the new function.");
-  global.crypto.getRandomValues = getRandomValues
+/** Polyfill to replace the crypto.subtle.generateKey function */
+async function _cryptoGenerateKey(algorithm, extractable, keyUsages) {
+  console.log("Entering _cryptoGenerateKey via crypto.subtle.generateKey with:");
+  console.log("algorithm:", algorithm);
+  console.log("extractable:", extractable);
+  console.log("keyUsages:", keyUsages);
+
+  let key_res;
+  global.crypto.subtle.generateKey(algorithm,
+    extractable, //whether the key is extractable (i.e. can be used in exportKey)
+    keyUsages //can be any combination of "sign" and "verify"
+  ).then(function(key){
+    console.log("crypto.subtle.generateKey / key: ", key)
+    key_res = key;
+    console.log("_cryptoGenerateKey about to return:", key_res);
+    return key_res;
+  }).catch(function(err){
+    console.log("Error crypto.subtle.generateKey: ", err);
+    key_res = err;
+    return err;
+  });
 }
-if (typeof global.crypto.subtle.digest !== 'function') {
-  console.log("global.crypto.getRandomValues doesn't exist, we assign the new function.");
-  global.crypto.subtle.digest = _digest
-}
-console.log("global.crypto: ", global.crypto);
+
+/** Replace default function
+global.crypto.getRandomValues = _getRandomValues;
+global.crypto.subtle.digest = digestCrypto;*/
+//global.crypto.subtle.generateKey = _cryptoGenerateKey;

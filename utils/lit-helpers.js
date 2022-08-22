@@ -1,10 +1,14 @@
-import LitJsSdk from 'lit-js-sdk'
+import LitJsSdk from 'lit-js-sdk-no-wasm'
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
 import { blobToBase64, decodeb64, buf2hex, getAddressFromDid, sleep } from "./index.js";
 
 /** Replaces localStorage in React Native */
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ReactNativeBlobUtil from 'react-native-blob-util'
+
+const Blob = ReactNativeBlobUtil.polyfill.Blob
+
 
 /** Initialize lit */
 let lit;
@@ -86,8 +90,10 @@ async function getAuthSig() {
 
 /** Decrypt a string using Lit based on a set of inputs. */
 export async function decryptString(encryptedContent) {
+  console.log("SDK: Enter decryptString.")
   /** Make sure Lit is ready before trying to decrypt the string */
-  await litIsReady();
+  /*await litIsReady();
+  console.log("SDK / decryptString: Lit is Ready.")*/
 
   /** Retrieve AuthSig */
   let authSig = await getAuthSig();
@@ -95,7 +101,9 @@ export async function decryptString(encryptedContent) {
   /** Decode string encoded as b64 to be supported by Ceramic */
   let decodedString;
   try {
+    console.log("encryptedContent.encryptedString: ", encryptedContent.encryptedString);
     decodedString = decodeb64(encryptedContent.encryptedString);
+    console.log("decodedString: ", decodedString);
   } catch(e) {
     console.log("Error decoding b64 string: ", e);
     throw new Error(e);
@@ -123,9 +131,19 @@ export async function decryptString(encryptedContent) {
     throw new Error(e);
   }
 
-  /** Decrypt the string using the encryption key */
+  /** Generate blob for string */
+  let _blob;
   try {
-      const decryptedString = await LitJsSdk.decryptString(new Blob([decodedString]), decryptedSymmKey);
+    _blob = await base64toBlob(decodedString);
+    console.log("Blob generated: ", _blob);
+  } catch(e) {
+    console.log("Error generating blob for string: ", e);
+    throw new Error(e);
+  }
+
+  /** Decrypt the message/blob using the decrypted symmetric key */
+  try {
+      const decryptedString = await LitJsSdk.decryptString(_blob, decryptedSymmKey);
       return {
         status: 200,
         result: decryptedString
@@ -134,6 +152,20 @@ export async function decryptString(encryptedContent) {
     console.log("Error decrypting string: ", e)
     throw new Error(e);
   }
+}
+
+async function base64toBlob(b64Data) {
+  console.log("base64toBlob() / b64Data:", b64Data);
+  let _blob;
+  //let _blob = new Blob([b64Data], {type: ""});
+  Blob.build(b64Data, { type: '' }).then((blob) => {
+    console.log("blob generated: ", blob);
+    _blob = blob;
+      // do something with the Blob
+  });
+  await _blob;
+  console.log("base64toBlob() / Abut to return: ", _blob);
+  return _blob
 }
 
 /** Encryp a DM */
@@ -172,10 +204,15 @@ export async function encryptString(accessControlConditions, body) {
   let authSig = await getAuthSig();
 
   /** Step 2: Encrypt message */
+  console.log("Before LitJsSdk.encryptString.");
   const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(body);
+  console.log("After LitJsSdk.encryptString.");
+  console.log("encryptedString: ", encryptedString);
+  console.log("symmetricKey: ", symmetricKey);
 
   /** We convert the encrypted string to base64 to make it work with Ceramic */
   let base64EncryptedString = await blobToBase64(encryptedString);
+  console.log("base64EncryptedString: ", base64EncryptedString);
 
   /** Step 4: Save encrypted content to lit nodes */
   let encryptedSymmetricKey;
