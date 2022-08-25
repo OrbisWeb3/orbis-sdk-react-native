@@ -23,8 +23,11 @@ const TESTNET_NODE_URL = "https://ceramic-clay.3boxlabs.com";
 const postSchemaStream = "kjzl6cwe1jw145vf8e3qu3bdm9o4wbe1x9tnq197re4knsywt0e9e8a49phe75n";
 const postSchemaCommit = "k3y52l7qbv1frxlrgboamtzkwucrmtszxoluwp4xj6sgixa09aatet6vyd17oyw3k";
 
-const channelSchemaStream = "kjzl6cwe1jw1481vk3z30owkij3665fa33b54b7wjw7v4csscrvfuurpv8xaikh";
-const channelSchemaCommit = "k6zn3rc3v8qin14jvrfyxfhajtbjuqj1ae3v7cptbh4dp47lm9rrrta4bw26td7cvu2ixs5s9be21r6q0jn4i1eb7zvtz2ka3xt9059eochaq5a1ajobl16";
+const groupSchemaStream = "kjzl6cwe1jw145mgwnp562fyppm4ckwonrd2ghnhge9g3ztd6wmiwgyqu7ngk67";
+const groupSchemaCommit = "k3y52l7qbv1frxjzs88isr5diuu5axgofcykxh9j04lf6keott406ewn2uuetrg1s";
+
+const channelSchemaStream = "kjzl6cwe1jw14aiqo5jzao1pb9vnw9zcaown9f524ohdb9wvm06zslvwtmjvqpp";
+const channelSchemaCommit = "k3y52l7qbv1fryit9nri2zv040695xizbg145eznz5a3io6hsshdqjfmxeoddpyps";
 
 const profileSchemaStream = "kjzl6cwe1jw147z3fd3tpwhnid3kroebsn9wimfawhcoe09thzudg43semys0dh";
 const profileSchemaCommit = "k3y52l7qbv1fry0pkd977c71j6l5fothvvpif8fgtize5flxtryvzml6y03bb6nsw";
@@ -339,14 +342,14 @@ export class Orbis {
 	/** Update user profile */
 	async updateProfile(content) {
 		/** Create a new stream with those details */
-		let result = await this.createTileDocument(content, ["orbis", "profile"], "k3y52l7qbv1frxkhi9rm5y7wh48sbs8u39jwx8ufgd443awu5s8y0xufnbprp5qm8");
+		let result = await this.createTileDocument(content, ["orbis", "profile"], profileSchemaCommit);
 		return result;
 	}
 
 	/** Save the last read time for notifications for the connected user */
 	async setNotificationsReadTime(type, timestamp) {
 		/** Create tile with the settings details */
-		let result = await this.createTileDocument({last_notifications_read_time: timestamp}, ["orbis", "settings", "notifications", type], "k3y52l7qbv1frykd0d0oyarndssmdfyxnuwt8v6da20i7pubplopd76mzndsf6hhc");
+		let result = await this.createTileDocument({last_notifications_read_time: timestamp}, ["orbis", "settings", "notifications", type], notificationsReadSchemaCommit);
 
 		/** Return confirmation results */
 		return result;
@@ -411,14 +414,14 @@ export class Orbis {
 		}
 
 		/** Try to create the stream and return the result */
-		let result = await this.createTileDocument(content, ["orbis", "reaction"], "k3y52l7qbv1frxuh68tbxjkp88bc37jc7p0thipi36nhhpgtb7r2ekimtudfbt9ts");
+		let result = await this.createTileDocument(content, ["orbis", "reaction"], reactionSchemaCommit);
 		return result;
 	}
 
 	/** Users can create or update a new group which can be used as a context when sharing posts */
 	async createGroup(content) {
 		/** Try to create a new Orbis group stream */
-		let result = await this.createTileDocument(content, ["orbis", "group"], "k3y52l7qbv1frxlke0x7wquudb9q00d6fsatbobub6in3yvim5x6r9cnjbi0i0phc");
+		let result = await this.createTileDocument(content, ["orbis", "group"], groupSchemaCommit);
 
 		/** If group creation was successful we also create the first channel */
 		if(result.doc) {
@@ -495,7 +498,7 @@ export class Orbis {
 		}
 
 		/** Try to create the stream */
-		let result = await this.createTileDocument(content, ["orbis", "group_member"], "k3y52l7qbv1frxy7omau0nf3w6mlc482iqog83e5utihk7pntqfpvpiintkiosg74");
+		let result = await this.createTileDocument(content, ["orbis", "group_member"], groupMemberSchemaCommit);
 		return result;
 	}
 
@@ -517,7 +520,7 @@ export class Orbis {
 		}
 
 		/** Try to create the stream */
-		let result = await this.createTileDocument(content, ["orbis", "follow"], "k3y52l7qbv1fry1x6vtd1396nvf1nljn62vfirvol5deahbl41rygx6ceo0cex9ts");
+		let result = await this.createTileDocument(content, ["orbis", "follow"], followSchemaCommit);
 		return result;
 	}
 
@@ -532,7 +535,7 @@ export class Orbis {
 		}
 
 		/** Update TileDocument with new content */
-		let result = await this.updateTileDocument(stream_id, content, ["orbis", "group"], "k3y52l7qbv1frxlke0x7wquudb9q00d6fsatbobub6in3yvim5x6r9cnjbi0i0phc");
+		let result = await this.updateTileDocument(stream_id, content, ["orbis", "group"], groupSchemaCommit);
 		return result;
 	}
 

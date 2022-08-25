@@ -1,6 +1,6 @@
 {
   "name": "@orbisclub/orbis-sdk-react-native",
-  "version": "0.0.87",
+  "version": "0.0.93",
   "description": "Official package to implement quickly an Orbis powered decentralized social layer within your React Native application.",
   "type": "module",
   "main": "index.js",
@@ -20,10 +20,11 @@
     "@supabase/supabase-js": "^1.35.3",
     "buffer": "^6.0.3",
     "dids": "^3.2.0",
-    "isomorphic-webcrypto": "^2.3.8",
+    "fast-base64-decode": "^1.0.0",
+    "js-sha256": "^0.9.0",
     "key-did-provider-ed25519": "^2.0.0",
     "key-did-resolver": "^2.0.4",
     "lit-js-sdk-no-wasm": "^1.1.214",
-    "react-native-webview-crypto": "^0.0.25"
+    "react-native-webcrypto": "^1.0.0-alpha.3"
   }
 }

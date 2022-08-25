@@ -1,12 +1,12 @@
 global.Buffer = global.Buffer || require('buffer').Buffer
-import 'react-app-polyfill/ie11';
 import 'core-js/features/array/find';
 import 'core-js/features/array/includes';
 import 'core-js/features/number/is-nan';
 import 'react-native-url-polyfill/auto';
 import * as encoding from 'text-encoding';
-const base64Decode = require('fast-base64-decode')
+//const base64Decode = require('fast-base64-decode')
 const { NativeModules } = require('react-native')
+
 
 /*if (typeof global.crypto !== 'object') {
   console.log("global.crypto doesn't exist, we initialize it.");
@@ -80,7 +80,7 @@ function getRandomBase64 (byteLength) {
  * Polyfill to replace the crypto.getRandomValues function
  * @param {Int8Array|Uint8Array|Int16Array|Uint16Array|Int32Array|Uint32Array|Uint8ClampedArray} array
  */
-function _getRandomValues (array) {
+/*function _getRandomValues (array) {
   if (!(array instanceof Int8Array || array instanceof Uint8Array || array instanceof Int16Array || array instanceof Uint16Array || array instanceof Int32Array || array instanceof Uint32Array || array instanceof Uint8ClampedArray)) {
     throw new TypeMismatchError('Expected an integer array')
   }
@@ -101,7 +101,7 @@ function _getRandomValues (array) {
   base64Decode(getRandomBase64(array.byteLength), new Uint8Array(array.buffer, array.byteOffset, array.byteLength))
 
   return array
-}
+}*/
 
 /** Polyfill to replace the crypto.subtle.digest function */
 async function _digest(algo, data) {
