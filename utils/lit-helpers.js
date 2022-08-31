@@ -97,7 +97,6 @@ export async function decryptString(encryptedContent) {
   /** Decode string encoded as b64 to be supported by Ceramic */
   let decodedString;
   try {
-    console.log("encryptedContent.encryptedString: ", encryptedContent.encryptedString);
     decodedString = decodeb64(encryptedContent.encryptedString);
     console.log("decodedString: ", decodedString);
   } catch(e) {
@@ -121,13 +120,15 @@ export async function decryptString(encryptedContent) {
         toDecrypt: encryptedContent.encryptedSymmetricKey,
         chain: 'ethereum',
         authSig
-    })
+    });
+    console.log("decryptedSymmKey: ", decryptedSymmKey);
   } catch(e) {
     console.log("Error getting encryptionKey: ", e);
     throw new Error(e);
   }
 
-  /** Generate blob for string */
+
+  /** Generate blob for string
   let _blob;
   try {
     _blob = base64toBlob(decodedString);
@@ -136,8 +137,8 @@ export async function decryptString(encryptedContent) {
     console.log("Error generating blob for string: ", e);
     throw new Error(e);
   }
-
-  /** Decrypt the message/blob using the decrypted symmetric key */
+  */
+  /** Decrypt the message/blob using the decrypted symmetric key
   try {
       const decryptedString = await LitJsSdk.decryptString(_blob, decryptedSymmKey);
       return {
@@ -147,6 +148,105 @@ export async function decryptString(encryptedContent) {
   } catch(e) {
     console.log("Error decrypting string: ", e)
     throw new Error(e);
+  }
+  */
+
+  let result = await litDecrypt(decodedString, decryptedSymmKey)
+  return result;
+}
+
+/** Debug only: Encrypt string from API */
+async function encryptStringFromAPI(accessControlConditions, body) {
+  console.log("Enter encrypStringFromAPI with ", body);
+  /** Retrieve AuthSig */
+  let authSig = await getAuthSig();
+
+  /** Making sure authsig is present  */
+  if(!authSig) {
+    return {
+      status: 300,
+      result: "Error encrypting string.",
+      error: "AuthSig must be present."
+    }
+  }
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      authSig: JSON.stringify(authSig),
+      accessControlConditions: accessControlConditions,
+      body: body
+    })
+  };
+  try {
+    let _data = await fetch("https://orbis.club/api/lit-encrypt", requestOptions);
+    let _result = await _data.json();
+    return _result;
+  } catch(e) {
+    console.log("Error encrypting string with API: ", e)
+    return {
+      status: 300,
+      result: e
+    };
+  }
+}
+
+/** Debug only: Encrypt string from API */
+export async function decryptStringFromAPI(encryptedContent) {
+  /** Retrieve AuthSig */
+  let authSig = await getAuthSig();
+
+  /** Making sure authsig is present  */
+  if(!authSig) {
+    return {
+      status: 300,
+      result: "Error decrypting string.",
+      error: "AuthSig must be present."
+    }
+  }
+
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      authSig: JSON.stringify(authSig),
+      encryptedContent: encryptedContent
+    })
+  };
+  try {
+    let _data = await fetch("https://orbis.club/api/lit-decrypt", requestOptions);
+    let _result = await _data.json();
+    return _result;
+  } catch(e) {
+    console.log("Error decrypting string with API: ", e)
+    return {
+      status: 300,
+      result: e
+    };
+  }
+}
+
+/** Finalize the decrypt function using the API */
+async function litDecrypt(decodedString, decryptedSymmKey) {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      decodedString: decodedString,
+      decryptedSymmKey: decryptedSymmKey
+    })
+  };
+  try {
+    let _data = await fetch("https://orbis.club/api/lit-blob", requestOptions);
+    let _result = await _data.json();
+    return _result;
+  } catch(e) {
+    console.log("Error retrieving decrypted string with API: ", e)
+    return {
+      status: 300,
+      result: e
+    };
   }
 }
 
@@ -164,7 +264,7 @@ export async function encryptDM(recipients, body) {
 
   /** Step 2: Encrypt string and return result */
   try {
-    let result = await encryptString(accessControlConditions, body);
+    let result = await encryptStringFromAPI(accessControlConditions, body);
     return result
   } catch(e) {
     console.log("Error encrypting DM: ", e);
@@ -179,7 +279,7 @@ export async function encryptPost(encryptionRules, body) {
 
   /** Step 2: Encrypt string and return result */
   try {
-    let result = await encryptString(accessControlConditions, body);
+    let result = await encrypString(accessControlConditions, body);
     return result
   } catch(e) {
     console.log("Error encrypting post: ", e);
@@ -193,15 +293,10 @@ export async function encryptString(accessControlConditions, body) {
   let authSig = await getAuthSig();
 
   /** Step 2: Encrypt message */
-  console.log("Before LitJsSdk.encryptString.");
   const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(body);
-  console.log("After LitJsSdk.encryptString.");
-  console.log("encryptedString: ", encryptedString);
-  console.log("symmetricKey: ", symmetricKey);
 
   /** We convert the encrypted string to base64 to make it work with Ceramic */
   let base64EncryptedString = await blobToBase64(encryptedString);
-  console.log("base64EncryptedString: ", base64EncryptedString);
 
   /** Step 4: Save encrypted content to lit nodes */
   let encryptedSymmetricKey;

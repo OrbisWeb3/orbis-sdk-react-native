@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /** Lit Protocol */
 import LitJsSdk from 'lit-js-sdk-no-wasm'
-import { connectLit, generateLitSignature, generateAccessControlConditionsForDMs, encryptDM, encryptPost, decryptString } from "./utils/lit-helpers.js";
+import { connectLit, generateLitSignature, generateAccessControlConditionsForDMs, encryptDM, encryptPost, decryptString, decryptStringFromAPI } from "./utils/lit-helpers.js";
 
 /** Internal helpers */
 import { indexer } from './lib/indexer-db.js';
@@ -195,13 +195,13 @@ export class Orbis {
 		/** Check if an existing session is stored in localStorage */
 		let sessionString = await AsyncStorage.getItem('ceramic-session');
 		if(!sessionString) {
+			console.log("There isn't any sessionString stored in local storage.");
 			return false;
 		}
 
 		/** Connect to Ceramic using the session previously stored */
 		try {
 			this.session = await DIDSession.fromSession(sessionString, null);
-			console.log("Reconnected to Ceramic automatically.");
 		} catch(e) {
 			console.log("Error reconnecting to Ceramic automatically: " + e);
 			return false;
@@ -209,6 +209,7 @@ export class Orbis {
 
 		/** Check if session is expired */
 		if(this.session.hasSession && this.session.isExpired) {
+			console.log("Session has expired.");
 			return false;
 		}
 
@@ -217,6 +218,8 @@ export class Orbis {
 			this.ceramic.did = this.session.getDID();
 		} catch(e) {
 			console.log("Error assigning did to Ceramic object: " + e);
+			console.log("this.ceramic:", this.ceramic);
+			console.log("this.session:", this.session);
 			return false;
 		}
 
@@ -347,9 +350,18 @@ export class Orbis {
 	}
 
 	/** Save the last read time for notifications for the connected user */
-	async setNotificationsReadTime(type, timestamp) {
-		/** Create tile with the settings details */
-		let result = await this.createTileDocument({last_notifications_read_time: timestamp}, ["orbis", "settings", "notifications", type], notificationsReadSchemaCommit);
+	async setNotificationsReadTime(type, timestamp, context = null) {
+		let result;
+		if(context) {
+			/** Create tile with the settings details, including context */
+			result = await this.createTileDocument({
+				last_notifications_read_time: timestamp,
+				context: context
+			}, ["orbis", "settings", "notifications", type], notificationsReadSchemaCommit);
+		} else {
+			/** Create tile with the settings details */
+			result = await this.createTileDocument({last_notifications_read_time: timestamp}, ["orbis", "settings", "notifications", type], notificationsReadSchemaCommit);
+		}
 
 		/** Return confirmation results */
 		return result;
@@ -633,7 +645,7 @@ export class Orbis {
 	async decryptPost(content) {
 		let res;
 		try {
-			res = await decryptString(content.encryptedBody);
+			res = await decryptStringFromAPI(content.encryptedBody);
 			return res;
 		} catch(e) {
 			return {
@@ -649,7 +661,7 @@ export class Orbis {
 		console.log("SDK: Enter decryptMessage.")
 		let res;
 		try {
-			res = await decryptString(content.encryptedMessage);
+			res = await decryptStringFromAPI(content.encryptedMessage);
 			return res;
 		} catch(e) {
 			return {

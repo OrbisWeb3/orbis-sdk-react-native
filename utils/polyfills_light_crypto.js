@@ -9,10 +9,13 @@ const base64Decode = require('fast-base64-decode')
 var sha256 = require('js-sha256');
 import 'react-native-webcrypto'
 
+if (typeof BigInt === 'undefined') global.BigInt = require('big-integer')
+
 if (typeof global.crypto !== 'object') {
   console.log("global.crypto doesn't exist, we initialize it.");
   global.crypto = {}
 }
+
 
 /*if (typeof global.crypto !== 'object') {
   console.log("global.crypto doesn't exist, we initialize it.");
