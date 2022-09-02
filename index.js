@@ -1,7 +1,7 @@
 /** Ceramic */
 import { CeramicClient } from '@ceramicnetwork/http-client';
 import { TileDocument } from '@ceramicnetwork/stream-tile';
-import { DIDSession } from '@glazed/did-session'
+import { DIDSession } from 'did-session'
 import { EthereumAuthProvider, SolanaAuthProvider } from '@ceramicnetwork/blockchain-utils-linking'
 
 /** Replaces localStorage in React Native */
@@ -124,12 +124,17 @@ export class Orbis {
 		/** Step 3: Create a new session for this did */
 		let did;
 		try {
-			this.session = new DIDSession({ authProvider })
-
 			/** Expire session in 30 days by default */
-			const expirationDate = new Date(Date.now() + 60 * 60 * 24 * 30 * 1000)
-			const expirationString = expirationDate.toISOString()
-			did = await this.session.authorize({expirationTime: expirationString})
+			const oneMonth = 60 * 60 * 24 * 31;
+
+			this.session = await DIDSession.authorize(
+				authProvider,
+				{
+					resources: [`ceramic://*`],
+					expiresInSecs: oneMonth
+				}
+			);
+			did = this.session.did;
 		} catch(e) {
 			return {
 				status: 300,
@@ -215,7 +220,7 @@ export class Orbis {
 
 		/** Session is still valid, connect */
 		try {
-			this.ceramic.did = this.session.getDID();
+			this.ceramic.did = this.session.did;
 		} catch(e) {
 			console.log("Error assigning did to Ceramic object: " + e);
 			console.log("this.ceramic:", this.ceramic);
@@ -573,7 +578,7 @@ export class Orbis {
 		recipients.push(this.session.id);
 
 		/** Create tile */
-		let result = await this.createTileDocument(_content, ["orbis", "conversation"], "k3y52l7qbv1frypruvvdaho7nnkc5d2s0hqq0uokxbg9wga7mnqv8ci5bdv13latc");
+		let result = await this.createTileDocument(_content, ["orbis", "conversation"], conversationSchemaCommit);
 
 		/** Return confirmation results */
 		return result;
