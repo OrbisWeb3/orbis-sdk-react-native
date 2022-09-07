@@ -1,6 +1,6 @@
 {
   "name": "@orbisclub/orbis-sdk-react-native",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "Official package to implement quickly an Orbis powered decentralized social layer within your React Native application.",
   "type": "module",
   "main": "index.js",

@@ -584,6 +584,29 @@ export class Orbis {
 		return result;
 	}
 
+	/** Update an existing conversation */
+	async updateConversation(stream_id, content) {
+		/** Make sure recipients field isn't empty */
+		if(!content || !content.recipients || content.recipients.length == 0) {
+			return {
+				status: 300,
+				error: e,
+				result: "You can't update a conversations without recipients."
+			}
+		}
+
+		/** Add sender to the list of recipients to make sure it can decrypt the messages as well */
+		let _content = {...content};
+		let recipients = _content.recipients;
+		recipients.push(this.session.id);
+
+		/** Update conversation tile */
+		let result = await this.updateTileDocument(stream_id, _content, ["orbis", "conversation"], conversationSchemaCommit);
+
+		/** Return confirmation results */
+		return result;
+	}
+
 	/** Send a direct message in a conversation */
 	async sendMessage(content) {
 		/** Require `message` */
