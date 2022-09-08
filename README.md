@@ -5,7 +5,7 @@ By using the Orbis SDK for React Native, developers can build their own decentra
 Our full documentation is available at https://orbis.club/developers
 
 ## Polyfills
-For the Ceramic package to work well you need to use some polyfills, you can integrate our by adding this line in App.js
+For the Ceramic packages to work well in a React Native environment you need to use some polyfills, you can integrate ours by adding this line in `App.js`.
 
 `import '@orbisclub/orbis-sdk-react-native/utils/polyfills_light_crypto';`
 
