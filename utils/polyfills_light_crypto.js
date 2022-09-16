@@ -16,7 +16,6 @@ if (typeof global.crypto !== 'object') {
   global.crypto = {}
 }
 
-
 /*if (typeof global.crypto !== 'object') {
   console.log("global.crypto doesn't exist, we initialize it.");
   global.crypto = {}

@@ -2,6 +2,7 @@ import LitJsSdk from 'lit-js-sdk-no-wasm'
 import { toUtf8Bytes } from "@ethersproject/strings";
 import { hexlify } from "@ethersproject/bytes";
 import { blobToBase64, decodeb64, buf2hex, getAddressFromDid, sleep } from "./index.js";
+//import msrcrypto from "msrcrypto";
 
 /** Replaces localStorage in React Native */
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,7 +12,7 @@ let lit;
 let litReady = false;
 export async function connectLit() {
   let ready;
-  lit = new LitJsSdk.LitNodeClient({alertWhenUnauthorized: false})
+  lit = new LitJsSdk.LitNodeClient({alertWhenUnauthorized: false, debug: false})
   await lit.connect();
   console.log("Lit is ready now!");
   litReady = true;
@@ -96,6 +97,7 @@ export async function decryptString(encryptedContent) {
 
   /** Decode string encoded as b64 to be supported by Ceramic */
   let decodedString;
+  console.log("before decodeb64: ", encryptedContent.encryptedString);
   try {
     decodedString = decodeb64(encryptedContent.encryptedString);
     console.log("decodedString: ", decodedString);
@@ -112,6 +114,7 @@ export async function decryptString(encryptedContent) {
     throw new Error(e);
   }
 
+
   /** Get encryption key from Lit */
   let decryptedSymmKey;
   try {
@@ -127,31 +130,18 @@ export async function decryptString(encryptedContent) {
     throw new Error(e);
   }
 
-
-  /** Generate blob for string
-  let _blob;
+  /** Finally decrypt the string using the workarounf function for React Native */
+  let result;
   try {
-    _blob = base64toBlob(decodedString);
-    console.log("Blob generated: ", _blob);
+    result = await litDecryptString(
+      decodedString,
+      decryptedSymmKey
+    );
+    console.log("result:", result);
   } catch(e) {
-    console.log("Error generating blob for string: ", e);
-    throw new Error(e);
+    console.log("Error decrypting string using lit workaround: ", e);
   }
-  */
-  /** Decrypt the message/blob using the decrypted symmetric key
-  try {
-      const decryptedString = await LitJsSdk.decryptString(_blob, decryptedSymmKey);
-      return {
-        status: 200,
-        result: decryptedString
-      };
-  } catch(e) {
-    console.log("Error decrypting string: ", e)
-    throw new Error(e);
-  }
-  */
 
-  let result = await litDecrypt(decodedString, decryptedSymmKey)
   return result;
 }
 
@@ -180,9 +170,11 @@ async function encryptStringFromAPI(accessControlConditions, body) {
     })
   };
   try {
-    let _data = await fetch("https://orbis.club/api/lit-encrypt", requestOptions);
+    let _data = await fetch("https://orbis-api-lit.herokuapp.com/lit-encrypt", requestOptions);
+    console.log("data retrieved from API: ", _data);
     let _result = await _data.json();
-    return _result;
+    console.log("_result retrieved from API: ", _result);
+    return _result.result;
   } catch(e) {
     console.log("Error encrypting string with API: ", e)
     return {
@@ -192,7 +184,7 @@ async function encryptStringFromAPI(accessControlConditions, body) {
   }
 }
 
-/** Debug only: Encrypt string from API */
+/** Debug only: Decrypt string from API */
 export async function decryptStringFromAPI(encryptedContent) {
   /** Retrieve AuthSig */
   let authSig = await getAuthSig();
@@ -215,34 +207,11 @@ export async function decryptStringFromAPI(encryptedContent) {
     })
   };
   try {
-    let _data = await fetch("https://orbis.club/api/lit-decrypt", requestOptions);
+    let _data = await fetch("https://orbis-api-lit.herokuapp.com/lit-decrypt", requestOptions);
     let _result = await _data.json();
     return _result;
   } catch(e) {
     console.log("Error decrypting string with API: ", e)
-    return {
-      status: 300,
-      result: e
-    };
-  }
-}
-
-/** Finalize the decrypt function using the API */
-async function litDecrypt(decodedString, decryptedSymmKey) {
-  const requestOptions = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      decodedString: decodedString,
-      decryptedSymmKey: decryptedSymmKey
-    })
-  };
-  try {
-    let _data = await fetch("https://orbis.club/api/lit-blob", requestOptions);
-    let _result = await _data.json();
-    return _result;
-  } catch(e) {
-    console.log("Error retrieving decrypted string with API: ", e)
     return {
       status: 300,
       result: e
@@ -258,13 +227,19 @@ function base64toBlob(b64Data) {
 }
 
 /** Encryp a DM */
-export async function encryptDM(recipients, body) {
+export async function encryptDM(recipients, body, api = false) {
   /** Step 1: Retrieve access control conditions from recipients */
   let accessControlConditions = generateAccessControlConditionsForDMs(recipients);
 
   /** Step 2: Encrypt string and return result */
   try {
-    let result = await encryptStringFromAPI(accessControlConditions, body);
+    let result;
+    if(api) {
+      result = await encryptStringFromAPI(accessControlConditions, body)
+    } else {
+      result = await encryptString(accessControlConditions, body);
+    }
+    console.log("result encryptDM:", result);
     return result
   } catch(e) {
     console.log("Error encrypting DM: ", e);
@@ -293,10 +268,21 @@ export async function encryptString(accessControlConditions, body) {
   let authSig = await getAuthSig();
 
   /** Step 2: Encrypt message */
-  const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(body);
+  const { encryptedString, symmetricKey } = await litEncryptString(body);
+  console.log("encryptedString: ", encryptedString);
+  console.log("symmetricKey: ", symmetricKey);
+
 
   /** We convert the encrypted string to base64 to make it work with Ceramic */
-  let base64EncryptedString = await blobToBase64(encryptedString);
+  //let base64EncryptedString = await blobToBase64(encryptedString);
+
+  let base64EncryptedString;
+  try {
+    base64EncryptedString = Buffer.from(encryptedString).toString('base64');
+    console.log("base64EncryptedString: ", base64EncryptedString);
+  } catch(e) {
+    console.log("Error base64EncryptedString: ", e);
+  }
 
   /** Step 4: Save encrypted content to lit nodes */
   let encryptedSymmetricKey;
@@ -319,6 +305,75 @@ export async function encryptString(accessControlConditions, body) {
     encryptedString: base64EncryptedString
   }
 }
+/** Workaround to decrypt a string with Lit on React Native
+const litDecryptString = async (encryptedString, symmetricKey) => {
+  const importedSymmKey = await msrcrypto.subtle.importKey(
+    "raw",
+    symmetricKey,
+    { name: "AES-CBC", length: 256 },
+    true,
+    ["encrypt", "decrypt"]
+  );
+
+  const recoveredIv = encryptedString.slice(0, 16);
+
+  const encryptedZipArrayBuffer = encryptedString.slice(16);
+
+  let decryptedString = await msrcrypto.subtle.decrypt(
+    {
+      name: "AES-CBC",
+      iv: recoveredIv,
+    },
+    importedSymmKey,
+    encryptedZipArrayBuffer
+  );
+
+  decryptedString = LitJsSdk.uint8arrayToString(
+    new Uint8Array(decryptedString),
+    "utf8"
+  );
+  return {
+    status: 200,
+    result: decryptedString
+  };
+};
+*/
+/** Workaround to encrypt a string with Lit on React Native
+const litEncryptString = async (str) => {
+  const encodedString = LitJsSdk.uint8arrayFromString(str, "utf8");
+
+  const symmKey = await msrcrypto.subtle.generateKey(
+    { name: "AES-CBC", length: 256 },
+    true,
+    ["encrypt", "decrypt"]
+  );
+
+  // encrypt the zip with symmetric key
+  const iv = crypto.getRandomValues(new Uint8Array(16));
+
+  const encryptedZipData = await msrcrypto.subtle.encrypt(
+    {
+      name: "AES-CBC",
+      iv,
+    },
+    symmKey,
+    encodedString
+  );
+  const encryptedString = [
+    ...Array.from(iv),
+    ...Array.from(new Uint8Array(encryptedZipData)),
+  ];
+
+  const exportedSymmKey = new Uint8Array(
+    await msrcrypto.subtle.exportKey("raw", symmKey)
+  );
+
+  return {
+    encryptedString,
+    symmetricKey: exportedSymmKey,
+  };
+};
+*/
 
 /** This function will take an array of recipients and turn it into a clean access control conditions array */
 export function generateAccessControlConditionsForDMs(recipients) {

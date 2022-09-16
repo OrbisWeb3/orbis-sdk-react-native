@@ -20,35 +20,35 @@ const MAINNET_NODE_URL = "https://node1.orbis.club/";
 const TESTNET_NODE_URL = "https://ceramic-clay.3boxlabs.com";
 
 /** Set schemas Commit IDs */
-const postSchemaStream = "kjzl6cwe1jw145vf8e3qu3bdm9o4wbe1x9tnq197re4knsywt0e9e8a49phe75n";
-const postSchemaCommit = "k3y52l7qbv1frxlrgboamtzkwucrmtszxoluwp4xj6sgixa09aatet6vyd17oyw3k";
+const postSchemaStream = "kjzl6cwe1jw1498inegtpji0iqf0htspb0qqswlofjy0hak1s3u2pf19qql7oak";
+const postSchemaCommit = "k3y52l7qbv1fry9okmevn9mo3p7urirw3yda6lju5qltvez2knv9v8qx1a52ukr28";
 
-const groupSchemaStream = "kjzl6cwe1jw145mgwnp562fyppm4ckwonrd2ghnhge9g3ztd6wmiwgyqu7ngk67";
-const groupSchemaCommit = "k3y52l7qbv1frxjzs88isr5diuu5axgofcykxh9j04lf6keott406ewn2uuetrg1s";
+const groupSchemaStream = "kjzl6cwe1jw1487a0xluwl3ip6lcdcfn8ahgomsbf8x5rf65mktdjuouz8xopbf";
+const groupSchemaCommit = "k3y52l7qbv1fry2bramzfrq10z2vrywf96yk6n61d8ffsyzvs0k0wd68sanjjo16o";
 
-const channelSchemaStream = "kjzl6cwe1jw14aiqo5jzao1pb9vnw9zcaown9f524ohdb9wvm06zslvwtmjvqpp";
-const channelSchemaCommit = "k3y52l7qbv1fryit9nri2zv040695xizbg145eznz5a3io6hsshdqjfmxeoddpyps";
+const channelSchemaStream = "kjzl6cwe1jw148ehiqrzh9npfr4kk4kyqd4as259yqzcr3i1dnrnm30ck5q0t6f";
+const channelSchemaCommit = "k3y52l7qbv1fry3r0laf0asokw0wi74l2zhaknj9iv3veoow9t50nx1ehbcp1rhmo";
 
-const profileSchemaStream = "kjzl6cwe1jw147z3fd3tpwhnid3kroebsn9wimfawhcoe09thzudg43semys0dh";
-const profileSchemaCommit = "k3y52l7qbv1fry0pkd977c71j6l5fothvvpif8fgtize5flxtryvzml6y03bb6nsw";
+const profileSchemaStream = "kjzl6cwe1jw145ak5a52cln1i6ztmece01w5qd03dib4lg8i3tt57sjauu14be8";
+const profileSchemaCommit = "k3y52l7qbv1frxhn39k40plvupdqqna03kdgorggo0274ojggr7z93ex979jyp14w";
 
-const reactionSchemaStream = "kjzl6cwe1jw14a1xm07lqfrpoi25nleamzakwbxp3qyh1ndxe6y2ha1i2stt9pk";
-const reactionSchemaCommit = "k3y52l7qbv1fryfhr0hi2k052m8fc7s5nnez8lwvminp57qb1gxe9mveojx0051q8";
+const reactionSchemaStream = "kjzl6cwe1jw146a2jirsoiku1eqsckmk8o7egba22jufwenwbb9fs096s340efk";
+const reactionSchemaCommit = "k3y52l7qbv1frxonm2thnyc45m0uhleofxo4ms07iq54h2g9xsg3475tc7q4iumm8";
 
-const followSchemaStream = "kjzl6cwe1jw146qqj9wfuzefr74q84v2mcoszkmdqgcv34r3b6z4c6o2s8mrd4m";
-const followSchemaCommit = "k3y52l7qbv1frxry4p2eosbqo1epmhukymy8e4yn5o4bh29snjllqunf7stdulcsg";
+const followSchemaStream = "kjzl6cwe1jw14av566q7ja9a2jy78uv5ih7pa683ozdulkpsc46qwsxfqzz3po5";
+const followSchemaCommit = "k3y52l7qbv1fryl9grzudl4xzm5v7izhj7eersc9m9nmhlfbdi5rzd9przztmejnk";
 
-const groupMemberSchemaStream = "kjzl6cwe1jw147b0vp4b9axd7eb6wntvnvbsvqkq5czlpaumirbzoxz3rmof4qc";
-const groupMemberSchemaCommit = "k3y52l7qbv1frxvye9emo25p9wlrl49gh5qrxdozdy4d6bx5s5ed9tdlmsh9nln9c";
+const groupMemberSchemaStream = "kjzl6cwe1jw146jk7s8ls9bjql42yqn1j5d3z0meue1zkgxeq2drqr0nl43soi8";
+const groupMemberSchemaCommit = "k3y52l7qbv1frxqj3rct6wya4d25131fuw65890fdk3y4xkdkpcxxa84nq56zy9kw";
 
-const conversationSchemaStream = "kjzl6cwe1jw149zcbbtuurfb60l26wrf49uxntln6zuagk4140dtpcevub8o4ac";
-const conversationSchemaCommit = "k3y52l7qbv1fryezbkk4ber0ves5rl4yzie3zdehwxqvedr0nwiqb889ufjxnihhc";
+const conversationSchemaStream = "kjzl6cwe1jw149ibyxllm19uiqvaj4gj2f84lq3y3xzs0nqpo2ufw63ut3xwn7i";
+const conversationSchemaCommit = "k3y52l7qbv1frybmd4exlop211b2ivzpjl89sqho2k1qf8otyj88h0rff301451c0";
 
-const messageSchemaStream = "kjzl6cwe1jw147amc7t931duuxwixltfss7uft7aa4cw7ik4dquprfs2bsgkeso";
-const messageSchemaCommit = "k3y52l7qbv1frxvviuvk0llujg13amz5cconsgfnt3yzp1fz35qyf747kjudt57uo";
+const messageSchemaStream = "kjzl6cwe1jw14bcux0xa3ba15686iwkw78y4xda0djl58ufyq219e116ihujfh8";
+const messageSchemaCommit = "k3y52l7qbv1fryorfuuknrk7c4sa6efokzjmr1af6obadawhixagyrrcebix662gw";
 
-const notificationsReadSchemaStream = "kjzl6cwe1jw147y7iul21b8xce0h2w0gz4favuj8d9ybxhlwn9lyrnc0t3dbtf4"
-const notificationsReadSchemaCommit = "k3y52l7qbv1fry0j9i1hqhbzh43ndgjncprgteh4ries4u57s5gc78lxhqvys17gg"
+const notificationsReadSchemaStream = "kjzl6cwe1jw14a4hg7d96srbp4tm2lox68ry6uv4m0m3pfsjztxx4pe6rliqquu"
+const notificationsReadSchemaCommit = "k3y52l7qbv1fryfzw38e9ccib6qakyi97weer4rhcskd6cwb26sx7lgkw491a6z9c"
 
 /** Definition of the Orbis class powering the Orbis SDK */
 export class Orbis {
@@ -608,7 +608,7 @@ export class Orbis {
 	}
 
 	/** Send a direct message in a conversation */
-	async sendMessage(content) {
+	async sendMessage(content, api = false) {
 		/** Require `message` */
 		if(!content || !content.body || content.body == undefined || content.body == "") {
 			return {
@@ -649,7 +649,7 @@ export class Orbis {
 		/** Try to encrypt content */
 		let _encryptedContent;
 		try {
-			_encryptedContent = await encryptDM(conversation.content.recipients, content.body);
+			_encryptedContent = await encryptDM(conversation.content.recipients, content.body, api);
 		} catch(e) {
 			return {
 				status: 300,
@@ -661,7 +661,9 @@ export class Orbis {
 		/** Create content object */
 		let _content = {
 			conversation_id: content.conversation_id,
-			encryptedMessage: _encryptedContent
+			encryptedMessage: _encryptedContent,
+			master: content.master ? content.master : null,
+      reply_to: content.reply_to ? content.reply_to : null
 		}
 
 		/** Create tile for this message */
@@ -673,7 +675,7 @@ export class Orbis {
 	async decryptPost(content) {
 		let res;
 		try {
-			res = await decryptStringFromAPI(content.encryptedBody);
+			res = await decryptString(content.encryptedBody);
 			return res;
 		} catch(e) {
 			return {
@@ -685,11 +687,15 @@ export class Orbis {
 	}
 
 	/** Decrypt a direct message using Lit Protocol */
-	async decryptMessage(content) {
+	async decryptMessage(content, api = false) {
 		console.log("SDK: Enter decryptMessage.")
 		let res;
 		try {
-			res = await decryptStringFromAPI(content.encryptedMessage);
+			if(api) {
+				res = await decryptStringFromAPI(content.encryptedMessage)
+			} else {
+				res = await decryptString(content.encryptedMessage);
+			}
 			return res;
 		} catch(e) {
 			return {
@@ -1028,8 +1034,8 @@ export class Orbis {
 	}
 
 	/** Get messages from one conversation */
-	async getMessages(conversation_id) {
-		let { data, error, status } = await this.api.from("orbis_v_messages").select().eq('conversation_id', conversation_id);
+	async getMessages(conversation_id, page = 0) {
+		let { data, error, status } = await this.api.from("orbis_v_messages").select().eq('conversation_id', conversation_id).range(page * 50, (page + 1) * 50 - 1);
 
 		/** Return results */
 		return({ data, error, status });
